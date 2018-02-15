@@ -7,3 +7,11 @@ FB_TARGET = ''
 # ! those account should be connected of Facebook
 # ! another account should be unique, so that there won't be any confusion 
 #   in picking the right receiver
+FB_CONTACTS = {
+    '',
+    '',
+    ''
+}
+# ^ Names and surnames of people, who you wish to text
+#   using the bot. On login, it will find them 
+#   and - to be sure - print their photos
