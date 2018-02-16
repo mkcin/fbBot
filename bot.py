@@ -66,10 +66,8 @@ class Bot(fb.Client):
                     self.send(fb.Message(text='Who would you wish to text?\n{}send \"###\" to cancel'.format(self._contactList)), thread_id=self._target.uid, thread_type=fb.ThreadType.USER)
                     self._waitingForNumber = True
                 elif(message_object.text=='###'):
-                    print('sending message canceled')
-                    self._waitingForNumber = False
-                    self._waitingForMessage = False
-                    self._receiver = None
+                    self.send(fb.Message(text='sending message canceled'), thread_id=self._target.uid, thread_type=fb.ThreadType.USER)
+                    self._cancelMessage
                 elif(self._waitingForNumber and not self._waitingForMessage and message_object.text.isdigit()):
                     if(self._contacts[int(message_object.text)] != None):
                         self.send(fb.Message(text='{} chosen, message:'.format(self._contacts[int(message_object.text)].name)), thread_id=self._target.uid, thread_type=fb.ThreadType.USER)
@@ -77,18 +75,28 @@ class Bot(fb.Client):
                         self._waitingForMessage = True
                     else:
                         self.send(fb.Message(text='index out of range, cancelling'), thread_id=self._target.uid, thread_type=fb.ThreadType.USER)
-                        self._waitingForNumber = False
-                        self._waitingForMessage = False
-                        self._receiver = None
+                        self._cancelMessage()
+                elif(self._waitingForNumber and not self._waitingForMessage and not message_object.text.isdigit()):
+                    self._cancelMessage()
                 elif(self._waitingForMessage):
                     self.send(message_object, thread_id=self._receiver.uid, thread_type=fb.ThreadType.USER)
                     self.send(fb.Message(text='message sent to {}'.format(self._receiver.name)), thread_id=self._target.uid, thread_type=fb.ThreadType.USER)
-                    self._waitingForMessage = False
-                    self._waitingForNumber = False
-                    self._receiver = None
+                    self._cancelMessage()
             else:
+                self.send(fb.Message(text='Message from {}'.self._findUid(author_id)), thread_id=self._target.uid, thread_type=fb.ThreadType.USER)
                 self.send(message_object, thread_id=self._target.uid, thread_type=fb.ThreadType.USER)
             self._lastMessage=message_object
+
+        def _cancelMessage(self):
+            self._waitingForMessage = False
+            self._waitingForNumber = False
+            self._receiver = None
+
+        def _findUid(self, id):
+            for key, value in self._contacts.items():
+                if(value.uid == id):
+                    return value.name
+            return 'Uknown user'
 
 if __name__ == '__main__':
     client = Bot(LOGIN, PASSWORD)
